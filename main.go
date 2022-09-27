@@ -62,22 +62,22 @@ func main() {
 			}
 			fmt.Println("Selesai input produk", newUser)
 		case 2:
-			// var email string
-			// var password string
-			// fmt.Print("email :")
-			// fmt.Scanln(email)
-			// fmt.Print("pass :")
-			// fmt.Scanln(password)
-			// _, err := userCTL.Login(email, password)
-			// if err != nil {
-			// 	fmt.Println("Login eror", err.Error())
-			// }
-			// fmt.Println("Login berhasil")
+			var email string
+			var password string
+			fmt.Print("email :")
+			fmt.Scanln(&email)
+			fmt.Print("pass :")
+			fmt.Scanln(&password)
+			_, err := userCTL.Login(email, password)
+			if err != nil {
+				fmt.Println("Login eror", err.Error())
+			}
+			fmt.Println("Login berhasil")
 		case 3:
 			var editUser model.User
-			//var id_user int
+			var id_user int
 			fmt.Print("id kalian :")
-			fmt.Scanln(editUser.Id_user)
+			fmt.Scanln(&id_user)
 			fmt.Print("edit nama :")
 			fmt.Scanln(&editUser.Nama)
 			fmt.Print("edit addres :")
@@ -87,7 +87,7 @@ func main() {
 			fmt.Print("edit password :")
 			fmt.Scanln(&editUser.Password)
 
-			UpdateUser, err := userCTL.Update(editUser.Id_user, editUser)
+			UpdateUser, err := userCTL.Update(id_user, editUser)
 			if err != nil {
 				fmt.Println("Eror update", err.Error())
 			}

@@ -24,7 +24,7 @@ type UserModel struct {
 
 // register
 func (um UserModel) Register(NewUser User) (User, error) {
-	Pass, err := bcrypt.GenerateFromPassword([]byte(NewUser.Password), bcrypt.MinCost)
+	Pass, err := bcrypt.GenerateFromPassword([]byte(NewUser.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return NewUser, err
 	}
@@ -37,23 +37,24 @@ func (um UserModel) Register(NewUser User) (User, error) {
 	return NewUser, nil
 }
 
-// func (um UserModel) Login(Email, Password string) (User, error) {
-// 	var user User
-// 	var err error
-// 	if err = um.DB.Where("Email = ?", Email).First(&user).Error; err != nil {
-// 		fmt.Println("email wrong")
-// 		return user, err
-// 	}
-// 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(Password))
-// 	if err != nil {
-// 		fmt.Println("password wrong")
-// 		return user, err
-// 	}
-// 	if err := um.DB.Save(user).Error; err != nil {
-// 		return user, err
-// 	}
-// 	return user, nil
-// }
+func (um UserModel) Login(Email, Password string) (User, error) {
+	var user User
+	var err error
+	if err = um.DB.Where("Email = ?", Email).First(&user).Error; err != nil {
+		fmt.Println("email wrong")
+		return user, err
+	}
+	//fmt.Println(user, Email, Password)
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(Password))
+	if err != nil {
+		fmt.Println("password wrong")
+		return user, err
+	}
+	if err := um.DB.Save(user).Error; err != nil {
+		return user, err
+	}
+	return user, nil
+}
 
 // tampilkan semua data
 func (um UserModel) GetAll() ([]User, error) {
@@ -65,9 +66,9 @@ func (um UserModel) GetAll() ([]User, error) {
 	return user, nil
 }
 
-func (um UserModel) Update(UpdateUser User, Id_user int) (User, error) {
+func (um UserModel) Update(UpdateUser User, userID int) (User, error) {
 	var user User
-	err := um.DB.Where("Id_user", Id_user).Updates(&user).Error
+	err := um.DB.Where("id=?", UpdateUser.Id_user).First(&user.Id_user).Error
 	if err != nil {
 		return user, err
 	}

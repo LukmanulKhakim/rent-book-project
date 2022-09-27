@@ -19,15 +19,15 @@ func (uc UserController) Register(NewReg model.User) (model.User, error) {
 	return NewUser, nil
 }
 
-// func (uc UserController) Login(Email string, Password string) (model.User, error) {
-// 	var userRequest model.User
-// 	user, err := uc.Model.Login(userRequest.Email, userRequest.Password)
-// 	if err != nil {
-// 		fmt.Println("eror login controll")
-// 		return user, err
-// 	}
-// 	return user, nil
-// }
+func (uc UserController) Login(Email string, Password string) (model.User, error) {
+	//var userRequest model.User
+	user, err := uc.Model.Login(Email, Password)
+	if err != nil {
+		fmt.Println("eror login controll")
+		return user, err
+	}
+	return user, nil
+}
 
 func (uc UserController) GetAll() ([]model.User, error) {
 	res, err := uc.Model.GetAll()
