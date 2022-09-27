@@ -68,7 +68,7 @@ func (um UserModel) GetAll() ([]User, error) {
 
 func (um UserModel) Update(UpdateUser User, userID int) (User, error) {
 	var user User
-	err := um.DB.Where("id=?", UpdateUser.Id_user).First(&user.Id_user).Error
+	err := um.DB.Where("id=?", UpdateUser.Id_user).Updates(&user).Error
 	if err != nil {
 		return user, err
 	}
