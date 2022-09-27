@@ -7,6 +7,8 @@ require (
 	gorm.io/driver/mysql v1.3.6
 )
 
+require gorm.io/plugin/soft_delete v1.2.0 // indirect
+
 require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect

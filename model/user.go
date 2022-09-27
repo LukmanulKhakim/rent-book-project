@@ -5,20 +5,24 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
+	"gorm.io/plugin/soft_delete"
 )
 
 type User struct {
-	Id_user  int
-	Nama     int
+	//gorm.Model
+	Id_user  int `gorm:"primaryKey"`
+	Nama     string
 	Addres   string
 	Email    string
-	Password string
+	Password string                `gorm:"type:varchar(255)"`
+	IsDel    soft_delete.DeletedAt `gorm:"softDelete:flag"`
 }
 
 type UserModel struct {
 	DB *gorm.DB
 }
 
+// register
 func (um UserModel) Register(NewUser User) (User, error) {
 	Pass, err := bcrypt.GenerateFromPassword([]byte(NewUser.Password), bcrypt.MinCost)
 	if err != nil {
@@ -27,28 +31,31 @@ func (um UserModel) Register(NewUser User) (User, error) {
 
 	NewUser.Password = string(Pass)
 	if err := um.DB.Save(&NewUser).Error; err != nil {
+		fmt.Println("Eror Regist")
 		return NewUser, err
 	}
 	return NewUser, nil
 }
 
-func (um UserModel) Login(Email, Password string) (User, error) {
-	var user User
-	var err error
+// func (um UserModel) Login(Email, Password string) (User, error) {
+// 	var user User
+// 	var err error
+// 	if err = um.DB.Where("Email = ?", Email).First(&user).Error; err != nil {
+// 		fmt.Println("email wrong")
+// 		return user, err
+// 	}
+// 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(Password))
+// 	if err != nil {
+// 		fmt.Println("password wrong")
+// 		return user, err
+// 	}
+// 	if err := um.DB.Save(user).Error; err != nil {
+// 		return user, err
+// 	}
+// 	return user, nil
+// }
 
-	if err = um.DB.Where("Email = ?", Email).First(&user).Error; err != nil {
-		fmt.Println("email wrong")
-		return user, err
-	}
-
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(Password))
-	if err != nil {
-		fmt.Println("password wrong")
-		return user, err
-	}
-	return user, nil
-}
-
+// tampilkan semua data
 func (um UserModel) GetAll() ([]User, error) {
 	var user []User
 	err := um.DB.Find(&user).Error
@@ -60,15 +67,10 @@ func (um UserModel) GetAll() ([]User, error) {
 
 func (um UserModel) Update(UpdateUser User, Id_user int) (User, error) {
 	var user User
-	err := um.DB.Where("Id_user", UpdateUser.Id_user).Error
+	err := um.DB.Where("Id_user", Id_user).Updates(&user).Error
 	if err != nil {
 		return user, err
 	}
-
-	user.Nama = UpdateUser.Nama
-	user.Addres = UpdateUser.Addres
-	user.Password = UpdateUser.Password
-	user.Email = UpdateUser.Email
 
 	err = um.DB.Save(&user).Error
 	if err != nil {
@@ -78,6 +80,13 @@ func (um UserModel) Update(UpdateUser User, Id_user int) (User, error) {
 
 }
 
-func (um UserModel) NonAktive(Id_user int) (User, error) {
+// func (um UserModel) NonAktive(nonAktive User, IsDel int) (User, error) {
+// 	var user User
 
-}
+// 	err := um.DB.Where("IsDel", 1).Update().Error
+// 	if err != nil {
+// 		fmt.Println("eror non Aktive")
+// 		return user, err
+// 	}
+// 	return user, nil
+// }
