@@ -9,13 +9,15 @@ import (
 )
 
 type User struct {
-	//gorm.Model
-	Id_user  int `gorm:"primaryKey"`
+	gorm.Model
+	//Id_user  int `gorm:"primaryKey"`
 	Nama     string
 	Addres   string
 	Email    string
 	Password string                `gorm:"type:varchar(255)"`
 	IsDel    soft_delete.DeletedAt `gorm:"softDelete:flag"`
+	Rent     []Rent                `gorm:"foreignKey:ID_User"`
+	Book     []Book                `gorm:"foreignKey:ID_User"`
 }
 
 type UserModel struct {

@@ -183,13 +183,14 @@ func main() {
 				}
 			case 3:
 				var produkBaru model.Book
+				var UserNow model.User
 				fmt.Print("judul :")
 				fmt.Scanln(&produkBaru.Judul)
 				fmt.Print("deskripsi :")
 				fmt.Scanln(&produkBaru.Deskripsi)
 				produkBaru.Is_Rent = false
 				produkBaru.Is_Deleted = false
-				//	produkBaru.Id_User = belum digabung
+				produkBaru.ID_User = UserNow.ID
 				BukuBaru, err := BookCTL.Add(produkBaru)
 				if err != nil {
 					fmt.Println("Eror insert", err.Error())

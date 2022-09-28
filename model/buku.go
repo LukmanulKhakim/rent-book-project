@@ -12,7 +12,8 @@ type Book struct {
 	Deskripsi  string `gorm:"size:255;not null"`
 	Is_Rent    bool
 	Is_Deleted bool
-	Id_User    uint
+	ID_User    uint
+	Rent       []Rent `gorm:foreignkey:ID_Buku`
 	//Id_Category uint
 }
 
