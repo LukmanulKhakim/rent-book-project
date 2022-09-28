@@ -66,19 +66,14 @@ func (um UserModel) GetAll() ([]User, error) {
 	return user, nil
 }
 
-func (um UserModel) Update(UpdateUser User, userID int) (User, error) {
-	var user User
-	err := um.DB.Where("id=?", UpdateUser.Id_user).Updates(&user).Error
+func (um UserModel) Edit(UpdateUser User) (User, error) {
+	//var user User
+	err := um.DB.Save(&UpdateUser).Error
 	if err != nil {
-		return user, err
+		fmt.Println("Error edit", err.Error())
+		return User{}, err
 	}
-
-	err = um.DB.Save(&user).Error
-	if err != nil {
-		return user, err
-	}
-	return user, nil
-
+	return UpdateUser, nil
 }
 
 // func (um UserModel) NonAktive(nonAktive User, IsDel int) (User, error) {
@@ -90,4 +85,19 @@ func (um UserModel) Update(UpdateUser User, userID int) (User, error) {
 // 		return user, err
 // 	}
 // 	return user, nil
+// }
+
+// func (um UserModel) Edit(UpdateUser User) (User, error) {
+// 	var user User
+// 	err := um.DB.Where("id=?", UpdateUser.Id_user).Updates(&user).Error
+// 	if err != nil {
+// 		return user, err
+// 	}
+
+// 	err = um.DB.Save(&user).Error
+// 	if err != nil {
+// 		return user, err
+// 	}
+// 	return user, nil
+
 // }

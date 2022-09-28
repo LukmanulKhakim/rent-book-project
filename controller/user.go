@@ -37,11 +37,11 @@ func (uc UserController) GetAll() ([]model.User, error) {
 	return res, nil
 }
 
-func (uc UserController) Update(id int, NewUpdate model.User) (model.User, error) {
+func (uc UserController) Edit(UpdateUser model.User) (model.User, error) {
 
-	UpdateUser, err := uc.Model.Update(NewUpdate, id)
+	res, err := uc.Model.Edit(UpdateUser)
 	if err != nil {
 		return model.User{}, err
 	}
-	return UpdateUser, nil
+	return res, nil
 }
