@@ -43,6 +43,8 @@ func main() {
 	migrate(gconn)
 	userMDL := model.UserModel{gconn}
 	userCTL := controller.UserController{userMDL}
+	BookMDL := model.BookModel{gconn}
+	BookCTL := controller.BookControl{BookMDL}
 	if err != nil {
 		fmt.Println("cannot connect to datavbase", err.Error())
 	}
@@ -60,6 +62,28 @@ func main() {
 			fmt.Scanln(&menu)
 			switch menu {
 			case 1:
+				res, err := BookCTL.GetAll()
+				if err != nil {
+					fmt.Println("Cant watch list book")
+				}
+				fmt.Println("List Book")
+				fmt.Printf("%4s | %5s| %15s| %15s| %15s|\n", "No", "Id ", "Judul", "Deskripsi", "Status")
+				if res != nil {
+					i := 1
+					var status string
+					for _, value := range res {
+						if value.Is_Rent {
+							status = "Not Available"
+						} else {
+							status = "Available"
+						}
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s |\n", i, value.ID, value.Judul, value.Deskripsi, status)
+						i++
+					}
+				} else {
+					fmt.Println("\n\t\\tt not found list book")
+				}
+
 			case 2:
 				Clear()
 				fmt.Println("--Login / Regist --")
@@ -126,8 +150,9 @@ func main() {
 			fmt.Println("1. Search Book")
 			fmt.Println("2. List Book")
 			fmt.Println("3. Add Book")
-			fmt.Println("4. Update Profile")
-			fmt.Println("5. My Rent")
+			fmt.Println("4. Edit Book")
+			fmt.Println("5. Delete Book")
+			fmt.Println("6. Delete Book")
 			fmt.Println("9. Logout")
 			fmt.Print("Enter Number : ")
 			fmt.Scanln(&menu)
@@ -135,9 +160,115 @@ func main() {
 			switch menu {
 			case 1:
 			case 2:
+				res, err := BookCTL.GetAll()
+				if err != nil {
+					fmt.Println("Cant watch list book")
+				}
+				fmt.Println("List Book")
+				fmt.Printf("%4s | %5s| %15s| %15s| %15s|\n", "No", "Id ", "Judul", "Deskripsi", "Status")
+				if res != nil {
+					i := 1
+					var status string
+					for _, value := range res {
+						if value.Is_Rent {
+							status = "Not Available"
+						} else {
+							status = "Available"
+						}
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s |\n", i, value.ID, value.Judul, value.Deskripsi, status)
+						i++
+					}
+				} else {
+					fmt.Println("\n\t\\tt not found list book")
+				}
 			case 3:
+				var produkBaru model.Book
+				fmt.Print("judul :")
+				fmt.Scanln(&produkBaru.Judul)
+				fmt.Print("deskripsi :")
+				fmt.Scanln(&produkBaru.Deskripsi)
+				produkBaru.Is_Rent = false
+				produkBaru.Is_Deleted = false
+				//	produkBaru.Id_User = belum digabung
+				BukuBaru, err := BookCTL.Add(produkBaru)
+				if err != nil {
+					fmt.Println("Eror insert", err.Error())
+				}
+				fmt.Println("Selesai input produk", BukuBaru)
 			case 4:
+				var numberbook int
+				fmt.Println("List my book")
+
+				res, err := BookCTL.GetAll()
+				if err != nil {
+					fmt.Println("Cant watch my book")
+				}
+				fmt.Println("List Book")
+				fmt.Printf("%4s | %5s| %15s| %15s| %15s|\n", "No", "Id ", "Judul", "Deskripsi", "Status")
+				if res != nil {
+					i := 1
+					var status string
+					for _, value := range res {
+						if value.Is_Rent {
+							status = "Not Available"
+						} else {
+							status = "Available"
+						}
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s |\n", i, value.ID, value.Judul, value.Deskripsi, status)
+						i++
+					}
+				} else {
+					fmt.Println("\n\t\\tt not found list book")
+				}
+				fmt.Println("Number book for edit")
+				fmt.Scanln(&numberbook)
+
+				var bukuEdit model.Book = res[numberbook-1]
+				fmt.Println("Tekan Enter untuk skip")
+				fmt.Println("Input Judul baru :")
+				fmt.Scanln(&bukuEdit.Judul)
+				fmt.Println("Input Deskrispi baru :")
+				fmt.Scanln(&bukuEdit.Deskripsi)
+				bukuEditres, err := BookCTL.Edit(bukuEdit)
+				if err != nil {
+					fmt.Println("eror edit")
+				}
+				fmt.Println("sukses", bukuEditres)
 			case 5:
+				var numberbook int
+				fmt.Println("List my book")
+
+				res, err := BookCTL.GetAll()
+				if err != nil {
+					fmt.Println("Cant watch my book")
+				}
+				fmt.Println("List Book")
+				fmt.Printf("%4s | %5s| %15s| %15s| %15s|\n", "No", "Id ", "Judul", "Deskripsi", "Status")
+				if res != nil {
+					i := 1
+					var status string
+					for _, value := range res {
+						if value.Is_Rent {
+							status = "Not Available"
+						} else {
+							status = "Available"
+						}
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s |\n", i, value.ID, value.Judul, value.Deskripsi, status)
+						i++
+					}
+				} else {
+					fmt.Println("\n\t\\tt not found list book")
+				}
+				fmt.Println("Number book for delete")
+				fmt.Scanln(&numberbook)
+				var bukuDel model.Book = res[numberbook-1]
+				fmt.Println("--hapus buku--")
+				bukuDelres, err := BookCTL.Delete(bukuDel)
+				if err != nil {
+					fmt.Println("Failed", "Deleting Book Failed", bukuDelres)
+					fmt.Println("", err.Error())
+				}
+				fmt.Println("Success", "Deleting Book Success", bukuDelres)
 			case 9:
 				var orYes bool = true
 				for orYes {
