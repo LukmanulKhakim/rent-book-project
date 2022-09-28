@@ -12,6 +12,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var UserNow model.User
+
 func connectGorm() (*gorm.DB, error) {
 	dsn := "root:@tcp(127.0.0.1:3306)/project_db?charset=utf8mb4&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
@@ -31,6 +33,8 @@ func Clear() {
 
 func migrate(db *gorm.DB) {
 	db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.Book{})
+	db.AutoMigrate(&model.Rent{})
 }
 
 func main() {
@@ -38,15 +42,16 @@ func main() {
 	var login bool = false
 	var next string
 	var menu int
-	var or string
 	gconn, err := connectGorm() //panggil
 	migrate(gconn)
 	userMDL := model.UserModel{gconn}
 	userCTL := controller.UserController{userMDL}
 	BookMDL := model.BookModel{gconn}
 	BookCTL := controller.BookControl{BookMDL}
+	RentMDL := model.RentModel{gconn}
+	RentCTL := controller.RentController{RentMDL}
 	if err != nil {
-		fmt.Println("cannot connect to datavbase", err.Error())
+		fmt.Println("cannot connect to database", err.Error())
 	}
 
 	for run {
@@ -83,19 +88,20 @@ func main() {
 				} else {
 					fmt.Println("\n\t\\tt not found list book")
 				}
-
+				fmt.Println("Enter untuk menu lainnya")
+				fmt.Scanln(&next)
 			case 2:
-				Clear()
+
 				fmt.Println("--Login / Regist --")
-				fmt.Println("1. Registrasi")
-				fmt.Println("2. Login")
-				fmt.Println("9. Exit Program")
-				fmt.Println("0. Home")
-				fmt.Println("Input Number: ")
+				fmt.Println("1. Registrasi      ")
+				fmt.Println("2. Login           ")
+				fmt.Println("9. Exit Program    ")
+				fmt.Println("0. Home            ")
+				fmt.Println("Input Number:      ")
 				fmt.Scanln(&menu)
 				switch menu {
 				case 1:
-					Clear()
+
 					var userBaru model.User
 					fmt.Println("--Registrasi--")
 					fmt.Print("nama :")
@@ -115,22 +121,25 @@ func main() {
 					}
 					fmt.Println("Berhasil Registrasi", newUser)
 				case 2:
-					Clear()
-
 					var email string
 					var password string
 					fmt.Print("email :")
 					fmt.Scanln(&email)
 					fmt.Print("pass :")
 					fmt.Scanln(&password)
-					_, err := userCTL.Login(email, password)
+					res, err := userCTL.Login(email, password)
 					if err != nil {
 						fmt.Println("Login eror", err.Error())
+
+					} else {
+
+						UserNow = res
+						login = true
+						fmt.Println("Login Berhasil ")
+						fmt.Println("Tekan Enter untuk ke Menu Member")
+						fmt.Scanln(&next)
 					}
-					fmt.Println("Login berhasil")
-					fmt.Println("Enter untuk ke area Member")
-					login = true
-					fmt.Scanln(&next)
+
 				case 9:
 					fmt.Println("Terima Kasih")
 					run = false
@@ -146,15 +155,17 @@ func main() {
 			}
 		} else {
 			fmt.Println("--Member area--")
-			fmt.Println("Selamat Datang")
-			fmt.Println("1. Search Book")
-			fmt.Println("2. List Book")
-			fmt.Println("3. Add Book")
-			fmt.Println("4. Edit Book")
-			fmt.Println("5. Delete Book")
-			fmt.Println("6. Delete Book")
-			fmt.Println("9. Logout")
-			fmt.Print("Enter Number : ")
+			fmt.Println("-Selamat Datang")
+			fmt.Println("1. Search Book ")
+			fmt.Println("2. List Book   ")
+			fmt.Println("3. Add Book    ")
+			fmt.Println("4. Edit Book   ")
+			fmt.Println("5. Delete Book ")
+			fmt.Println("---Rent Area-- ")
+			fmt.Println("6. Rent Book   ")
+			fmt.Println("7. Return Book ")
+			fmt.Println("9. Logout      ")
+			fmt.Print("Enter Number :   ")
 			fmt.Scanln(&menu)
 
 			switch menu {
@@ -181,9 +192,11 @@ func main() {
 				} else {
 					fmt.Println("\n\t\\tt not found list book")
 				}
+				fmt.Println("Enter untuk menu lainnya")
+				fmt.Scanln(&next)
 			case 3:
 				var produkBaru model.Book
-				var UserNow model.User
+
 				fmt.Print("judul :")
 				fmt.Scanln(&produkBaru.Judul)
 				fmt.Print("deskripsi :")
@@ -197,7 +210,7 @@ func main() {
 				}
 				fmt.Println("Selesai input produk", BukuBaru)
 			case 4:
-				var numberbook int
+				var number int
 				fmt.Println("List my book")
 
 				res, err := BookCTL.GetAll()
@@ -222,9 +235,9 @@ func main() {
 					fmt.Println("\n\t\\tt not found list book")
 				}
 				fmt.Println("Number book for edit")
-				fmt.Scanln(&numberbook)
+				fmt.Scanln(&number)
 
-				var bukuEdit model.Book = res[numberbook-1]
+				var bukuEdit model.Book = res[number-1]
 				fmt.Println("Tekan Enter untuk skip")
 				fmt.Println("Input Judul baru :")
 				fmt.Scanln(&bukuEdit.Judul)
@@ -236,7 +249,7 @@ func main() {
 				}
 				fmt.Println("sukses", bukuEditres)
 			case 5:
-				var numberbook int
+				var number int
 				fmt.Println("List my book")
 
 				res, err := BookCTL.GetAll()
@@ -261,8 +274,8 @@ func main() {
 					fmt.Println("\n\t\\tt not found list book")
 				}
 				fmt.Println("Number book for delete")
-				fmt.Scanln(&numberbook)
-				var bukuDel model.Book = res[numberbook-1]
+				fmt.Scanln(&number)
+				var bukuDel model.Book = res[number-1]
 				fmt.Println("--hapus buku--")
 				bukuDelres, err := BookCTL.Delete(bukuDel)
 				if err != nil {
@@ -270,26 +283,67 @@ func main() {
 					fmt.Println("", err.Error())
 				}
 				fmt.Println("Success", "Deleting Book Success", bukuDelres)
-			case 9:
-				var orYes bool = true
-				for orYes {
-					fmt.Println("Logout ? (y/n)")
-					fmt.Scanln(&or)
-					if or == "Y" || or == "y" {
-						orYes = false
-						login = false
-						Clear()
-					} else if or == "N" || or == "n" {
-						orYes = false
-						Clear()
-					} else {
-						orYes = true
-					}
+			case 6:
+				//	var number int
+				//var UserNow model.User
+				res, err := RentCTL.GetUserRent(UserNow.ID)
+				if err != nil {
+					fmt.Println("List Book Eror")
+					//fmt.Println(UserNow.ID)
 				}
+				fmt.Println("List of My Borrowed Books")
+				fmt.Printf("%4s | %5s | %15s | %15s | %15s| \n", "No", "Id", "Judul", "Deskripsi", "Pemilik")
+				if res != nil {
+					i := 1
+					for _, value := range res {
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s |\n", i, value.ID, value.Judul_Book, value.Deskripsi_Book, value.Books_Nama)
+						i++
+					}
+				} else {
+					fmt.Println("\n\t\\tt Book Title not Found")
+				}
+				fmt.Println("Enter untuk menu lainnya")
+				fmt.Scanln(&next)
+			case 7:
+				var number int
+				fmt.Println("List my book")
 
+				res, err := BookCTL.GetAll()
+				if err != nil {
+					fmt.Println("Cant watch my book")
+				}
+				fmt.Println("List Book")
+				fmt.Printf("%4s | %5s| %15s| %15s| %15s|\n", "No", "Id ", "Judul", "Deskripsi", "Status")
+				if res != nil {
+					i := 1
+					var status string
+					for _, value := range res {
+						if value.Is_Rent {
+							status = "Not Available"
+						} else {
+							status = "Available"
+						}
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s |\n", i, value.ID, value.Judul, value.Deskripsi, status)
+						i++
+					}
+				} else {
+					fmt.Println("\n\t\\tt not found list book")
+				}
+				fmt.Println("Number book for rent")
+				fmt.Scanln(&number)
+
+				var bukuRent model.Book = res[number-1]
+				fmt.Println("ketik 1 untuk pinjam :")
+				fmt.Scanln(&bukuRent.Is_Rent)
+				bukuEditres, err := BookCTL.Edit(bukuRent)
+				if err != nil {
+					fmt.Println("eror edit")
+				}
+				fmt.Println("sukses", bukuEditres)
+			case 9:
+				login = false
+				Clear()
 			}
-
 		}
-
 	}
 }

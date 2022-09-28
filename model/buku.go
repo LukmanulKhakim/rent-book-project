@@ -13,7 +13,7 @@ type Book struct {
 	Is_Rent    bool
 	Is_Deleted bool
 	ID_User    uint
-	Rent       []Rent `gorm:foreignkey:ID_Buku`
+	Rents      []Rent `gorm:"foreignKey:ID_Buku"`
 	//Id_Category uint
 }
 

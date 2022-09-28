@@ -16,8 +16,8 @@ type User struct {
 	Email    string
 	Password string                `gorm:"type:varchar(255)"`
 	IsDel    soft_delete.DeletedAt `gorm:"softDelete:flag"`
-	Rent     []Rent                `gorm:"foreignKey:ID_User"`
-	Book     []Book                `gorm:"foreignKey:ID_User"`
+	Books    []Book                `gorm:"foreignKey:ID_User"`
+	Rents    []Rent                `gorm:"foreignKey:ID_User"`
 }
 
 type UserModel struct {
