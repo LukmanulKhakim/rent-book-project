@@ -54,3 +54,12 @@ func (uc UserController) GetIdUser(userId uint) (model.User, error) {
 	}
 	return result, nil
 }
+
+func (uc UserController) NonAktive(NonAktive model.User) (model.User, error) {
+
+	res, err := uc.Model.NonAktive(NonAktive)
+	if err != nil {
+		return model.User{}, err
+	}
+	return res, nil
+}

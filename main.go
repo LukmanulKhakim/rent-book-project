@@ -43,6 +43,7 @@ func migrate(db *gorm.DB) {
 func main() {
 	var run bool = true
 	var login bool = false
+	//	var profile bool = false
 	var next string
 	var menu int
 	gconn, err := connectGorm() //panggil
@@ -104,7 +105,7 @@ func main() {
 				fmt.Scanln(&menu)
 				switch menu {
 				case 1:
-
+					//registrasi
 					var userBaru model.User
 					fmt.Println("--Registrasi--")
 					fmt.Print("nama :")
@@ -124,6 +125,7 @@ func main() {
 					}
 					fmt.Println("Berhasil Registrasi", newUser)
 				case 2:
+					//login
 					var email string
 					var password string
 					fmt.Print("email :")
@@ -131,8 +133,9 @@ func main() {
 					fmt.Print("pass :")
 					fmt.Scanln(&password)
 					res, err := userCTL.Login(email, password)
-					if err != nil {
+					if err != nil || res.IsDel == 1 {
 						fmt.Println("Login eror", err.Error())
+						login = false
 
 					} else {
 
@@ -291,8 +294,11 @@ func main() {
 				if err != nil {
 					fmt.Println("Failed", "Deleting Book Failed", bukuDelres)
 					fmt.Println("", err.Error())
+				} else {
+					fmt.Println("Success", "Deleting Book Success", bukuDelres)
+					bukuDelres.Is_Deleted = true
 				}
-				fmt.Println("Success", "Deleting Book Success", bukuDelres)
+
 			case 6:
 				//proses peminjaman dengan user now tidak dapat melihat bukunya sendiri
 				resNotRent, err := BookCTL.NotRent(UserNow.ID)
@@ -320,7 +326,6 @@ func main() {
 				var Number int
 				fmt.Println("Tekan Nomor Buku Untuk di Pinjam")
 				fmt.Scanln(&Number)
-				fmt.Scanln(&next)
 				var BookRent model.Book = resNotRent[Number-1]
 
 				me, err := userCTL.GetIdUser(BookRent.ID_User)
@@ -423,6 +428,22 @@ func main() {
 						}
 					}
 
+				}
+			case 10:
+
+				DelAcount, err := userCTL.GetIdUser(UserNow.ID)
+				if err != nil {
+					fmt.Println("Failed Del Acount")
+				} else {
+					DelAcount.IsDel = 1
+				}
+				upDelAcount, err := userCTL.NonAktive(DelAcount)
+				if err != nil {
+					fmt.Println("Eror update Del Acount", err)
+				} else {
+
+					fmt.Println("Sucses Delete Acount", upDelAcount.Nama)
+					login = false
 				}
 
 			case 9:
