@@ -72,4 +72,11 @@ func (bc BookController) GetMyBook(ID_User uint) ([]model.Book, error) {
 	return res, nil
 }
 
-//func (bc BookController)
+func (bc BookController) Search(judul string) ([]model.Book, error) {
+	res, err := bc.Model.Search(judul)
+	if err != nil {
+		fmt.Println("eror on Search control", err.Error())
+		return nil, err
+	}
+	return res, nil
+}

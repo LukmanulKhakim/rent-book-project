@@ -155,6 +155,29 @@ func main() {
 
 				}
 			case 3:
+				var schBook model.Book
+				fmt.Println("masukkan judul")
+				fmt.Scanln(&schBook.Judul)
+
+				res, err := BookCTL.Search(schBook.Judul)
+				if err != nil {
+					fmt.Println("eror search", err.Error())
+				}
+				if res != nil {
+					i := 1
+					var status string
+					for _, value := range res {
+						if value.Is_Rent {
+							status = "Not Available"
+						} else {
+							status = "Available"
+						}
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s | \n", i, value.ID, value.Judul, value.Deskripsi, status)
+						i++
+					}
+				} else {
+					fmt.Println("eror")
+				}
 
 			case 9:
 				fmt.Println("Terima Kasih")

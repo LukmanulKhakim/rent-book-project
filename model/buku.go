@@ -90,7 +90,7 @@ func (bm BookModel) GetMyBook(ID_User uint) ([]Book, error) {
 
 func (bm BookModel) Search(judul string) ([]Book, error) {
 	var res []Book
-	err := bm.DB.Where("Judul = ?", judul).Find(&res).Error
+	err := bm.DB.Where(&Book{Judul: judul}).Find(&res).Error
 	if err != nil {
 		fmt.Println("Error search book model", err.Error())
 		return nil, err
