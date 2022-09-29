@@ -9,13 +9,16 @@ import (
 )
 
 type User struct {
-	//gorm.Model
-	Id_user  int `gorm:"primaryKey"`
+	gorm.Model
+	//Id_user  int `gorm:"primaryKey"`
 	Nama     string
 	Addres   string
 	Email    string
-	Password string                `gorm:"type:varchar(255)"`
-	IsDel    soft_delete.DeletedAt `gorm:"softDelete:flag"`
+	Password string `gorm:"type:varchar(255)"`
+	//IsDel    bool
+	IsDel soft_delete.DeletedAt `gorm:"softDelete:flag"`
+	Books []Book                `gorm:"foreignKey:ID_User;"`
+	Rents []Rent                `gorm:"foreignKey:ID_User;"`
 }
 
 type UserModel struct {
@@ -76,6 +79,16 @@ func (um UserModel) Edit(UpdateUser User) (User, error) {
 	return UpdateUser, nil
 }
 
+func (um UserModel) GetIdUser(userId uint) (User, error) {
+	var result User
+	err := um.DB.First(&result, userId).Error
+	if err != nil {
+		fmt.Println("Error GetIdUser", err.Error())
+		return User{}, err
+	}
+	return result, nil
+}
+
 // func (um UserModel) NonAktive(nonAktive User, IsDel int) (User, error) {
 // 	var user User
 
@@ -85,19 +98,4 @@ func (um UserModel) Edit(UpdateUser User) (User, error) {
 // 		return user, err
 // 	}
 // 	return user, nil
-// }
-
-// func (um UserModel) Edit(UpdateUser User) (User, error) {
-// 	var user User
-// 	err := um.DB.Where("id=?", UpdateUser.Id_user).Updates(&user).Error
-// 	if err != nil {
-// 		return user, err
-// 	}
-
-// 	err = um.DB.Save(&user).Error
-// 	if err != nil {
-// 		return user, err
-// 	}
-// 	return user, nil
-
 // }

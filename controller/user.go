@@ -45,3 +45,12 @@ func (uc UserController) Edit(UpdateUser model.User) (model.User, error) {
 	}
 	return res, nil
 }
+
+func (uc UserController) GetIdUser(userId uint) (model.User, error) {
+	result, err := uc.Model.GetIdUser(userId)
+	if err != nil {
+		fmt.Println("Error on getById controler", err.Error())
+		return model.User{}, err
+	}
+	return result, nil
+}
