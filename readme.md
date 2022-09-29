@@ -18,6 +18,8 @@ Adapun fitur yang ada pada project ini adalah :
 Adapun package yang digunakan pada project ini adalah :
 
 GORM (Golang Object Relation Mapping), anda memerlukan beberapa package diantara sebagai berikut :
+
+
     ```
     go get -u github.com/go-sql-driver/mysql
     go get -u gorm.io/gorm
