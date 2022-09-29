@@ -68,14 +68,24 @@ func (bm BookModel) Delete(deletedBook Book) (Book, error) {
 	return deletedBook, nil
 }
 
-func (bm BookModel) NotRent() ([]Book, error) {
+func (bm BookModel) NotRent(ID_User uint) ([]Book, error) {
 	var result []Book
-	err := bm.DB.Where("is_Rent = ?", 0).Find(&result).Error
+	err := bm.DB.Where("is_Rent = ? AND ID_User != ?", 0, ID_User).Find(&result).Error
 	if err != nil {
 		fmt.Println("Error on NotRent", err.Error())
 		return nil, err
 	}
 	return result, nil
+}
+
+func (bm BookModel) GetMyBook(ID_User uint) ([]Book, error) {
+	var res []Book
+	err := bm.DB.Where("ID_User =?", ID_User).Find(&res).Error
+	if err != nil {
+		fmt.Println("Error on GetAll Model", err.Error())
+		return nil, err
+	}
+	return res, nil
 }
 
 // func (bm BookModel) Search(judul string) ([]Book, error) {

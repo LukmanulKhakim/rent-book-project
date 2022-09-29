@@ -157,16 +157,20 @@ func main() {
 				run = false
 			}
 		} else {
-			fmt.Println("--Member area--")
-			fmt.Println("-Selamat Datang")
+			fmt.Println("===============")
+			fmt.Println("| Member Area |")
+			fmt.Println("===============")
 			fmt.Println("1. Search Book ")
-			fmt.Println("2. List Book   ")
-			fmt.Println("3. Add Book    ")
-			fmt.Println("4. Edit Book   ")
-			fmt.Println("5. Delete Book ")
-			fmt.Println("---Rent Area-- ")
+			fmt.Println("2. List All Book   ")
+			fmt.Println("3. Add MyBook    ")
+			fmt.Println("4. Edit MyBook   ")
+			fmt.Println("5. Delete MyBook ")
+			fmt.Println("===============")
+			fmt.Println("|  Rent Area  |")
+			fmt.Println("===============")
 			fmt.Println("6. Rent Book   ")
-			fmt.Println("7. Return Book ")
+			fmt.Println("7. My Rent     ")
+			fmt.Println("8. Return Book ")
 			fmt.Println("9. Logout      ")
 			fmt.Print("Enter Number :   ")
 			fmt.Scanln(&menu)
@@ -179,7 +183,7 @@ func main() {
 					fmt.Println("Cant watch list book")
 				}
 				fmt.Println("List Book")
-				fmt.Printf("%4s | %5s| %15s| %15s| %15s|\n", "No", "Id ", "Judul", "Deskripsi", "Status")
+				fmt.Printf("%4s | %5s| %15s| %15s| %15s|%15s|\n", "No", "Id ", "Judul", "Deskripsi", "Status", "Pemilik")
 				if res != nil {
 					i := 1
 					var status string
@@ -189,7 +193,7 @@ func main() {
 						} else {
 							status = "Available"
 						}
-						fmt.Printf("%4d | %5d | %15s | %15s | %15s |\n", i, value.ID, value.Judul, value.Deskripsi, status)
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s | %5d| \n", i, value.ID, value.Judul, value.Deskripsi, status, value.ID_User)
 						i++
 					}
 				} else {
@@ -213,10 +217,11 @@ func main() {
 				}
 				fmt.Println("Selesai input produk", BukuBaru)
 			case 4:
+				//edit buku
 				var number int
 				fmt.Println("List my book")
 
-				res, err := BookCTL.GetAll()
+				res, err := BookCTL.GetMyBook(UserNow.ID)
 				if err != nil {
 					fmt.Println("Cant watch my book")
 				}
@@ -251,11 +256,13 @@ func main() {
 					fmt.Println("eror edit")
 				}
 				fmt.Println("sukses", bukuEditres)
+
+				//Delete Book
 			case 5:
 				var number int
 				fmt.Println("List my book")
 
-				res, err := BookCTL.GetAll()
+				res, err := BookCTL.GetMyBook(UserNow.ID)
 				if err != nil {
 					fmt.Println("Cant watch my book")
 				}
@@ -287,13 +294,13 @@ func main() {
 				}
 				fmt.Println("Success", "Deleting Book Success", bukuDelres)
 			case 6:
-
-				resNotRent, err := BookCTL.NotRent()
+				//proses peminjaman dengan user now tidak dapat melihat bukunya sendiri
+				resNotRent, err := BookCTL.NotRent(UserNow.ID)
 				if err != nil {
 					fmt.Println("Cant show list book", err.Error())
 				}
 				fmt.Println("List Book")
-				fmt.Printf("%4s | %5s | %15s | %15s | %15s | %15s |\n", "No", "ID_Buku", "Judul", "Deskrpisi", "Status", "pemilik")
+				fmt.Printf("%4s | %5s | %15s | %15s | %15s |\n", "No", "ID_Buku", "Judul", "Deskrpisi", "Status")
 
 				if resNotRent != nil {
 					i := 1
@@ -304,7 +311,7 @@ func main() {
 						} else {
 							status = "Available"
 						}
-						fmt.Printf("%4d | %5d | %15s | %15s | %15s | %5d| \n", i, value.ID, value.Judul, value.Deskripsi, status, value.ID_User)
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s | \n", i, value.ID, value.Judul, value.Deskripsi, status)
 						i++
 					}
 				} else {
@@ -313,6 +320,7 @@ func main() {
 				var Number int
 				fmt.Println("Tekan Nomor Buku Untuk di Pinjam")
 				fmt.Scanln(&Number)
+				fmt.Scanln(&next)
 				var BookRent model.Book = resNotRent[Number-1]
 
 				me, err := userCTL.GetIdUser(BookRent.ID_User)
@@ -350,6 +358,26 @@ func main() {
 				fmt.Println("Enter untuk menu lainnya")
 				fmt.Scanln(&next)
 			case 7:
+				res, err := RentCTL.GetUserRent(UserNow.ID)
+				if err != nil {
+					fmt.Println("Cant List Book Rent", err.Error())
+				}
+
+				fmt.Println("List Rent Book")
+				fmt.Printf("%4s | %5s | %15s | %15s | %15s |\n", "No", "ID Buku", "Judul", "Deskripsi", "Pemilik")
+
+				if res != nil {
+					i := 1
+					for _, value := range res {
+						fmt.Printf("%5d | %5d | %15s | %15s | %5d |\n", i, value.ID, value.Judul_Book, value.Deskripsi_Book, value.ID_User)
+						i++
+					}
+				} else {
+					fmt.Println("Book Not Found")
+				}
+				fmt.Println("Enter untuk menu lainnya")
+				fmt.Scanln(&next)
+			case 8:
 
 				var number int
 				res, err := RentCTL.GetUserRent(UserNow.ID)

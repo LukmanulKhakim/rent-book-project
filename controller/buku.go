@@ -54,10 +54,19 @@ func (bc BookController) Delete(deletedBook model.Book) (model.Book, error) {
 	return res, nil
 }
 
-func (bc BookController) NotRent() ([]model.Book, error) {
-	res, err := bc.Model.NotRent()
+func (bc BookController) NotRent(ID_User uint) ([]model.Book, error) {
+	res, err := bc.Model.NotRent(ID_User)
 	if err != nil {
 		fmt.Println("Error on NotRent control", err.Error())
+		return nil, err
+	}
+	return res, nil
+}
+
+func (bc BookController) GetMyBook(ID_User uint) ([]model.Book, error) {
+	res, err := bc.Model.GetMyBook(ID_User)
+	if err != nil {
+		fmt.Println("Error on GetAll control", err.Error())
 		return nil, err
 	}
 	return res, nil
