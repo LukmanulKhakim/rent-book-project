@@ -94,3 +94,13 @@ func (um UserModel) NonAktive(NonAktive User) (User, error) {
 	}
 	return NonAktive, nil
 }
+
+func (um UserModel) UpdateProfile(ID_User uint) ([]User, error) {
+	var res []User
+	err := um.DB.Where("id =?", ID_User).Find(&res).Error
+	if err != nil {
+		fmt.Println("Error on GetAll Model", err.Error())
+		return nil, err
+	}
+	return res, nil
+}

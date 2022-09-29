@@ -155,6 +155,7 @@ func main() {
 
 				}
 			case 3:
+
 			case 9:
 				fmt.Println("Terima Kasih")
 				run = false
@@ -175,6 +176,8 @@ func main() {
 			fmt.Println("7. My Rent     ")
 			fmt.Println("8. Return Book ")
 			fmt.Println("9. Logout      ")
+			fmt.Println("10. NonAktive Acount ")
+			fmt.Println("11. Edit Acount ")
 			fmt.Print("Enter Number :   ")
 			fmt.Scanln(&menu)
 
@@ -356,7 +359,7 @@ func main() {
 						if upRentbook.ID != 0 {
 							fmt.Println("Success rent book : "+resRentBook.Judul_Book, "")
 						} else {
-							fmt.Println("Error on Update isBorrowedBook, no book updated", err.Error())
+							fmt.Println("No Rent Book", err.Error())
 						}
 					}
 				}
@@ -443,8 +446,51 @@ func main() {
 				} else {
 
 					fmt.Println("Sucses Delete Acount", upDelAcount.Nama)
+					fmt.Println("Enter untuk logout")
+					fmt.Scanln(&next)
 					login = false
 				}
+
+			case 11:
+				//edit profile
+				res, err := userCTL.UpdateProfile(UserNow.ID)
+				if err != nil {
+					fmt.Println("Cant watch your profile")
+				}
+				fmt.Println("Your Profile")
+				fmt.Printf("%4s | %5s| %15s| %15s| %15s| %s | \n", "No", "Id ", "Nama", "Email", "Addres", "status")
+				if res != nil {
+					i := 1
+					var status string
+					for _, value := range res {
+						if value.IsDel == 0 {
+							status = "Active"
+						} else {
+							status = "Non-Active"
+						}
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s | %s| \n", i, value.ID, value.Nama, value.Email, value.Addres, status)
+						i++
+					}
+				} else {
+					fmt.Println("not found profile")
+				}
+				var number int
+				fmt.Println("number your acount (No)")
+				fmt.Scanln(&number)
+
+				var ProfileEdit model.User = res[number-1]
+				fmt.Println("Tekan Enter untuk skip")
+				fmt.Println("Update Nama Anda :")
+				fmt.Scanln(&ProfileEdit.Nama)
+				fmt.Println("Update Email Anda :")
+				fmt.Scanln(&ProfileEdit.Email)
+				fmt.Println("Update Alamat Anda :")
+				fmt.Scanln(&ProfileEdit.Addres)
+				profilup, err := userCTL.Edit(ProfileEdit)
+				if err != nil {
+					fmt.Println("eror update profile")
+				}
+				fmt.Println("sukses", profilup)
 
 			case 9:
 				login = false

@@ -63,3 +63,12 @@ func (uc UserController) NonAktive(NonAktive model.User) (model.User, error) {
 	}
 	return res, nil
 }
+
+func (uc UserController) UpdateProfile(ID_User uint) ([]model.User, error) {
+	res, err := uc.Model.UpdateProfile(ID_User)
+	if err != nil {
+		fmt.Println("Error on GetAll control", err.Error())
+		return nil, err
+	}
+	return res, nil
+}
