@@ -88,12 +88,12 @@ func (bm BookModel) GetMyBook(ID_User uint) ([]Book, error) {
 	return res, nil
 }
 
-// func (bm BookModel) Search(judul string) ([]Book, error) {
-// 	var result []Book
-// 	err := bm.DB.Where(&Book{Judul: judul}).Find(&result).Error
-// 	if err != nil {
-// 		fmt.Println("Error on Query", err.Error())
-// 		return nil, err
-// 	}
-// 	return result, nil
-// }
+func (bm BookModel) Search(judul string) ([]Book, error) {
+	var res []Book
+	err := bm.DB.Where("Judul = ?", judul).Find(&res).Error
+	if err != nil {
+		fmt.Println("Error search book model", err.Error())
+		return nil, err
+	}
+	return res, nil
+}

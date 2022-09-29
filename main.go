@@ -43,6 +43,7 @@ func migrate(db *gorm.DB) {
 func main() {
 	var run bool = true
 	var login bool = false
+	//	var profile bool = false
 	var next string
 	var menu int
 	gconn, err := connectGorm() //panggil
@@ -104,7 +105,7 @@ func main() {
 				fmt.Scanln(&menu)
 				switch menu {
 				case 1:
-
+					//registrasi
 					var userBaru model.User
 					fmt.Println("--Registrasi--")
 					fmt.Print("nama :")
@@ -124,6 +125,7 @@ func main() {
 					}
 					fmt.Println("Berhasil Registrasi", newUser)
 				case 2:
+					//login
 					var email string
 					var password string
 					fmt.Print("email :")
@@ -131,8 +133,9 @@ func main() {
 					fmt.Print("pass :")
 					fmt.Scanln(&password)
 					res, err := userCTL.Login(email, password)
-					if err != nil {
+					if err != nil || res.IsDel == 1 {
 						fmt.Println("Login eror", err.Error())
+						login = false
 
 					} else {
 
@@ -152,6 +155,7 @@ func main() {
 
 				}
 			case 3:
+
 			case 9:
 				fmt.Println("Terima Kasih")
 				run = false
@@ -172,6 +176,8 @@ func main() {
 			fmt.Println("7. My Rent     ")
 			fmt.Println("8. Return Book ")
 			fmt.Println("9. Logout      ")
+			fmt.Println("10. NonAktive Acount ")
+			fmt.Println("11. Edit Acount ")
 			fmt.Print("Enter Number :   ")
 			fmt.Scanln(&menu)
 
@@ -291,8 +297,11 @@ func main() {
 				if err != nil {
 					fmt.Println("Failed", "Deleting Book Failed", bukuDelres)
 					fmt.Println("", err.Error())
+				} else {
+					fmt.Println("Success", "Deleting Book Success", bukuDelres)
+					bukuDelres.Is_Deleted = true
 				}
-				fmt.Println("Success", "Deleting Book Success", bukuDelres)
+
 			case 6:
 				//proses peminjaman dengan user now tidak dapat melihat bukunya sendiri
 				resNotRent, err := BookCTL.NotRent(UserNow.ID)
@@ -320,7 +329,6 @@ func main() {
 				var Number int
 				fmt.Println("Tekan Nomor Buku Untuk di Pinjam")
 				fmt.Scanln(&Number)
-				fmt.Scanln(&next)
 				var BookRent model.Book = resNotRent[Number-1]
 
 				me, err := userCTL.GetIdUser(BookRent.ID_User)
@@ -351,7 +359,7 @@ func main() {
 						if upRentbook.ID != 0 {
 							fmt.Println("Success rent book : "+resRentBook.Judul_Book, "")
 						} else {
-							fmt.Println("Error on Update isBorrowedBook, no book updated", err.Error())
+							fmt.Println("No Rent Book", err.Error())
 						}
 					}
 				}
@@ -424,6 +432,65 @@ func main() {
 					}
 
 				}
+			case 10:
+
+				DelAcount, err := userCTL.GetIdUser(UserNow.ID)
+				if err != nil {
+					fmt.Println("Failed Del Acount")
+				} else {
+					DelAcount.IsDel = 1
+				}
+				upDelAcount, err := userCTL.NonAktive(DelAcount)
+				if err != nil {
+					fmt.Println("Eror update Del Acount", err)
+				} else {
+
+					fmt.Println("Sucses Delete Acount", upDelAcount.Nama)
+					fmt.Println("Enter untuk logout")
+					fmt.Scanln(&next)
+					login = false
+				}
+
+			case 11:
+				//edit profile
+				res, err := userCTL.UpdateProfile(UserNow.ID)
+				if err != nil {
+					fmt.Println("Cant watch your profile")
+				}
+				fmt.Println("Your Profile")
+				fmt.Printf("%4s | %5s| %15s| %15s| %15s| %s | \n", "No", "Id ", "Nama", "Email", "Addres", "status")
+				if res != nil {
+					i := 1
+					var status string
+					for _, value := range res {
+						if value.IsDel == 0 {
+							status = "Active"
+						} else {
+							status = "Non-Active"
+						}
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s | %s| \n", i, value.ID, value.Nama, value.Email, value.Addres, status)
+						i++
+					}
+				} else {
+					fmt.Println("not found profile")
+				}
+				var number int
+				fmt.Println("number your acount (No)")
+				fmt.Scanln(&number)
+
+				var ProfileEdit model.User = res[number-1]
+				fmt.Println("Tekan Enter untuk skip")
+				fmt.Println("Update Nama Anda :")
+				fmt.Scanln(&ProfileEdit.Nama)
+				fmt.Println("Update Email Anda :")
+				fmt.Scanln(&ProfileEdit.Email)
+				fmt.Println("Update Alamat Anda :")
+				fmt.Scanln(&ProfileEdit.Addres)
+				profilup, err := userCTL.Edit(ProfileEdit)
+				if err != nil {
+					fmt.Println("eror update profile")
+				}
+				fmt.Println("sukses", profilup)
 
 			case 9:
 				login = false

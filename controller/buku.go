@@ -72,11 +72,4 @@ func (bc BookController) GetMyBook(ID_User uint) ([]model.Book, error) {
 	return res, nil
 }
 
-// func (bc BooksControl) GetWhere(_title string) ([]model.Book, error) {
-// 	result, err := bc.Model.Search(_title)
-// 	if err != nil {
-// 		fmt.Println("Error on GetWhere", err.Error())
-// 		return nil, err
-// 	}
-// 	return result, nil
-// }
+//func (bc BookController)
