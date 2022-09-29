@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"project-rent/controller"
 	"project-rent/model"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
@@ -13,6 +14,7 @@ import (
 )
 
 var UserNow model.User
+var BookNow model.Book
 
 func connectGorm() (*gorm.DB, error) {
 	dsn := "root:@tcp(127.0.0.1:3306)/project_db?charset=utf8mb4&parseTime=True&loc=Local"
@@ -32,9 +34,10 @@ func Clear() {
 }
 
 func migrate(db *gorm.DB) {
+	db.AutoMigrate(&model.Rent{})
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.Book{})
-	db.AutoMigrate(&model.Rent{})
+
 }
 
 func main() {
@@ -284,62 +287,72 @@ func main() {
 				}
 				fmt.Println("Success", "Deleting Book Success", bukuDelres)
 			case 6:
-				//	var number int
-				//var UserNow model.User
-				res, err := RentCTL.GetUserRent(UserNow.ID)
-				if err != nil {
-					fmt.Println("List Book Eror")
-					//fmt.Println(UserNow.ID)
-				}
-				fmt.Println("List of My Borrowed Books")
-				fmt.Printf("%4s | %5s | %15s | %15s | %15s| \n", "No", "Id", "Judul", "Deskripsi", "Pemilik")
-				if res != nil {
-					i := 1
-					for _, value := range res {
-						fmt.Printf("%4d | %5d | %15s | %15s | %15s |\n", i, value.ID, value.Judul_Book, value.Deskripsi_Book, value.Books_Nama)
-						i++
-					}
-				} else {
-					fmt.Println("\n\t\\tt Book Title not Found")
-				}
-				fmt.Println("Enter untuk menu lainnya")
-				fmt.Scanln(&next)
-			case 7:
-				var number int
-				fmt.Println("List my book")
 
-				res, err := BookCTL.GetAll()
+				fmt.Println("\t--List Available Book--")
+
+				resNotRent, err := BookCTL.NotRent()
 				if err != nil {
-					fmt.Println("Cant watch my book")
+					fmt.Println("Cant show list book", err.Error())
 				}
 				fmt.Println("List Book")
-				fmt.Printf("%4s | %5s| %15s| %15s| %15s|\n", "No", "Id ", "Judul", "Deskripsi", "Status")
-				if res != nil {
+				fmt.Printf("%4s | %5s | %15s | %15s | %15s | %15s |\n", "No", "Id_Buku", "Judul", "Deskrpisi", "Status", "pemilik")
+
+				if resNotRent != nil {
 					i := 1
 					var status string
-					for _, value := range res {
+					for _, value := range resNotRent {
 						if value.Is_Rent {
 							status = "Not Available"
 						} else {
 							status = "Available"
 						}
-						fmt.Printf("%4d | %5d | %15s | %15s | %15s |\n", i, value.ID, value.Judul, value.Deskripsi, status)
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s | %5d| \n", i, value.ID, value.Judul, value.Deskripsi, status, value.ID_User)
 						i++
 					}
 				} else {
-					fmt.Println("\n\t\\tt not found list book")
+					fmt.Println(" Not Found")
 				}
-				fmt.Println("Number book for rent")
-				fmt.Scanln(&number)
+				var Number int
+				fmt.Println("Tekan Npmor Buku Untuk di Pinjam")
+				fmt.Scanln(&Number)
+				var BookRent model.Book = resNotRent[Number-1]
 
-				var bukuRent model.Book = res[number-1]
-				fmt.Println("ketik 1 untuk pinjam :")
-				fmt.Scanln(&bukuRent.Is_Rent)
-				bukuEditres, err := BookCTL.Edit(bukuRent)
+				me, err := userCTL.GetIdUser(BookRent.ID_User)
 				if err != nil {
-					fmt.Println("eror edit")
+					fmt.Println("Failed ")
 				}
-				fmt.Println("sukses", bukuEditres)
+				var newRent model.Rent
+				newRent.Return_book = time.Time{}
+				newRent.Books_IsRent = false
+				newRent.Books_Nama = me.Nama
+				newRent.Books_Email = me.Email
+				newRent.Judul_Book = BookRent.Judul
+				newRent.Deskripsi_Book = BookRent.Deskripsi
+				newRent.ID_Buku = BookRent.ID
+				newRent.ID_User = UserNow.ID
+
+				resRentBook, err := RentCTL.AddRent(newRent)
+
+				if err != nil {
+					fmt.Println("Error on Borrow Book", err.Error())
+				} else {
+					// Update Status Is Borrowed di Buku
+					BookRent.Is_Rent = true
+					upRentbook, err := BookCTL.Edit(BookRent)
+					if err != nil {
+						fmt.Println("Eror Update Rent Book", err.Error())
+					} else {
+						if upRentbook.ID != 0 {
+							fmt.Println("Success rent book : "+resRentBook.Judul_Book, "")
+						} else {
+							fmt.Println("Error on Update isBorrowedBook, no book updated", err.Error())
+						}
+					}
+				}
+				fmt.Println("Enter untuk menu lainnya")
+				fmt.Scanln(&next)
+			case 7:
+
 			case 9:
 				login = false
 				Clear()

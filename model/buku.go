@@ -8,13 +8,12 @@ import (
 
 type Book struct {
 	gorm.Model
-	Judul      string `gorm:"size:255;not null"`
-	Deskripsi  string `gorm:"size:255;not null"`
+	Judul      string
+	Deskripsi  string
 	Is_Rent    bool
 	Is_Deleted bool
 	ID_User    uint
-	Rents      []Rent `gorm:"foreignKey:ID_Buku"`
-	//Id_Category uint
+	Rents      []Rent `gorm:"foreignKey:ID_Buku;"`
 }
 
 type BookModel struct {
@@ -26,7 +25,7 @@ func (bm BookModel) GetAll() ([]Book, error) {
 	var res []Book
 	err := bm.DB.Find(&res).Error
 	if err != nil {
-		fmt.Println("Error on Query", err.Error())
+		fmt.Println("Error on GetAll Model", err.Error())
 		return nil, err
 	}
 	return res, nil
@@ -35,7 +34,7 @@ func (bm BookModel) GetAll() ([]Book, error) {
 func (bm BookModel) Add(newBook Book) (Book, error) {
 	err := bm.DB.Save(&newBook).Error
 	if err != nil {
-		fmt.Println("Error on Create", err.Error())
+		fmt.Println("Error on Add Model", err.Error())
 		return Book{}, err
 	}
 	return newBook, nil
@@ -44,7 +43,7 @@ func (bm BookModel) Add(newBook Book) (Book, error) {
 func (bm BookModel) Edit(bukuEdit Book) (Book, error) {
 	err := bm.DB.Save(&bukuEdit).Error
 	if err != nil {
-		fmt.Println("Error on Edit", err.Error())
+		fmt.Println("Error on Edit Model", err.Error())
 		return Book{}, err
 	}
 	return bukuEdit, nil
@@ -53,10 +52,20 @@ func (bm BookModel) Edit(bukuEdit Book) (Book, error) {
 func (bm BookModel) Delete(deletedBook Book) (Book, error) {
 	err := bm.DB.Delete(&deletedBook).Error
 	if err != nil {
-		fmt.Println("Error on Delete", err.Error())
+		fmt.Println("Error on Delete Model", err.Error())
 		return Book{}, err
 	}
 	return deletedBook, nil
+}
+
+func (bm BookModel) NotRent() ([]Book, error) {
+	var result []Book
+	err := bm.DB.Where("is_Rent = ?", 0).Find(&result).Error
+	if err != nil {
+		fmt.Println("Error on NotRent", err.Error())
+		return nil, err
+	}
+	return result, nil
 }
 
 // func (bm BookModel) Search(judul string) ([]Book, error) {

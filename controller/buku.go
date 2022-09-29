@@ -10,39 +10,48 @@ type BookControl struct {
 }
 
 func (bc BookControl) GetAll() ([]model.Book, error) {
-	result, err := bc.Model.GetAll()
+	res, err := bc.Model.GetAll()
 	if err != nil {
-		fmt.Println("Error on GetAll", err.Error())
+		fmt.Println("Error on GetAll control", err.Error())
 		return nil, err
 	}
-	return result, nil
+	return res, nil
 }
 
 func (bc BookControl) Add(newBook model.Book) (model.Book, error) {
-	addBook, err := bc.Model.Add(newBook)
+	res, err := bc.Model.Add(newBook)
 	if err != nil {
-		fmt.Println("Error on Add", err.Error())
+		fmt.Println("Error on Add control", err.Error())
 		return model.Book{}, err
 	}
-	return addBook, nil
+	return res, nil
 }
 
 func (bc BookControl) Edit(updatedBooks model.Book) (model.Book, error) {
-	result, err := bc.Model.Edit(updatedBooks)
+	res, err := bc.Model.Edit(updatedBooks)
 	if err != nil {
-		fmt.Println("Error on Edit", err.Error())
+		fmt.Println("Error on Edit control", err.Error())
 		return model.Book{}, err
 	}
-	return result, nil
+	return res, nil
 }
 
 func (bc BookControl) Delete(deletedBook model.Book) (model.Book, error) {
-	result, err := bc.Model.Delete(deletedBook)
+	res, err := bc.Model.Delete(deletedBook)
 	if err != nil {
-		fmt.Println("Error on Delete", err.Error())
+		fmt.Println("Error on Delete control", err.Error())
 		return model.Book{}, err
 	}
-	return result, nil
+	return res, nil
+}
+
+func (bc BookControl) NotRent() ([]model.Book, error) {
+	res, err := bc.Model.NotRent()
+	if err != nil {
+		fmt.Println("Error on NotRent control", err.Error())
+		return nil, err
+	}
+	return res, nil
 }
 
 // func (bc BooksControl) GetWhere(_title string) ([]model.Book, error) {
