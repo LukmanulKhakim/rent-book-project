@@ -27,7 +27,7 @@ type RentModel struct {
 
 func (rm RentModel) GetUserRent(UserID uint) ([]Rent, error) {
 	var res []Rent
-	err := rm.DB.Where("Books_IsRent=? AND id_user = ?", 0, UserID).Find(&res).Error
+	err := rm.DB.Where("Books_Is_Rent=? AND id_user = ?", 0, UserID).Find(&res).Error
 	if err != nil {
 		fmt.Println("Eror Get User Rent", err.Error())
 		return nil, err

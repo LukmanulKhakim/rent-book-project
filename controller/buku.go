@@ -5,11 +5,11 @@ import (
 	"project-rent/model"
 )
 
-type BookControl struct {
+type BookController struct {
 	Model model.BookModel
 }
 
-func (bc BookControl) GetAll() ([]model.Book, error) {
+func (bc BookController) GetAll() ([]model.Book, error) {
 	res, err := bc.Model.GetAll()
 	if err != nil {
 		fmt.Println("Error on GetAll control", err.Error())
@@ -18,7 +18,16 @@ func (bc BookControl) GetAll() ([]model.Book, error) {
 	return res, nil
 }
 
-func (bc BookControl) Add(newBook model.Book) (model.Book, error) {
+func (bc BookController) GetBookId(ID_Book uint) (model.Book, error) {
+	result, err := bc.Model.GetBookId(ID_Book)
+	if err != nil {
+		fmt.Println("Error on GetWhere", err.Error())
+		return model.Book{}, err
+	}
+	return result, nil
+}
+
+func (bc BookController) Add(newBook model.Book) (model.Book, error) {
 	res, err := bc.Model.Add(newBook)
 	if err != nil {
 		fmt.Println("Error on Add control", err.Error())
@@ -27,7 +36,7 @@ func (bc BookControl) Add(newBook model.Book) (model.Book, error) {
 	return res, nil
 }
 
-func (bc BookControl) Edit(updatedBooks model.Book) (model.Book, error) {
+func (bc BookController) Edit(updatedBooks model.Book) (model.Book, error) {
 	res, err := bc.Model.Edit(updatedBooks)
 	if err != nil {
 		fmt.Println("Error on Edit control", err.Error())
@@ -36,7 +45,7 @@ func (bc BookControl) Edit(updatedBooks model.Book) (model.Book, error) {
 	return res, nil
 }
 
-func (bc BookControl) Delete(deletedBook model.Book) (model.Book, error) {
+func (bc BookController) Delete(deletedBook model.Book) (model.Book, error) {
 	res, err := bc.Model.Delete(deletedBook)
 	if err != nil {
 		fmt.Println("Error on Delete control", err.Error())
@@ -45,7 +54,7 @@ func (bc BookControl) Delete(deletedBook model.Book) (model.Book, error) {
 	return res, nil
 }
 
-func (bc BookControl) NotRent() ([]model.Book, error) {
+func (bc BookController) NotRent() ([]model.Book, error) {
 	res, err := bc.Model.NotRent()
 	if err != nil {
 		fmt.Println("Error on NotRent control", err.Error())

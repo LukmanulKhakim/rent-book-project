@@ -50,7 +50,7 @@ func main() {
 	userMDL := model.UserModel{gconn}
 	userCTL := controller.UserController{userMDL}
 	BookMDL := model.BookModel{gconn}
-	BookCTL := controller.BookControl{BookMDL}
+	BookCTL := controller.BookController{BookMDL}
 	RentMDL := model.RentModel{gconn}
 	RentCTL := controller.RentController{RentMDL}
 	if err != nil {
@@ -288,14 +288,12 @@ func main() {
 				fmt.Println("Success", "Deleting Book Success", bukuDelres)
 			case 6:
 
-				fmt.Println("\t--List Available Book--")
-
 				resNotRent, err := BookCTL.NotRent()
 				if err != nil {
 					fmt.Println("Cant show list book", err.Error())
 				}
 				fmt.Println("List Book")
-				fmt.Printf("%4s | %5s | %15s | %15s | %15s | %15s |\n", "No", "Id_Buku", "Judul", "Deskrpisi", "Status", "pemilik")
+				fmt.Printf("%4s | %5s | %15s | %15s | %15s | %15s |\n", "No", "ID_Buku", "Judul", "Deskrpisi", "Status", "pemilik")
 
 				if resNotRent != nil {
 					i := 1
@@ -313,7 +311,7 @@ func main() {
 					fmt.Println(" Not Found")
 				}
 				var Number int
-				fmt.Println("Tekan Npmor Buku Untuk di Pinjam")
+				fmt.Println("Tekan Nomor Buku Untuk di Pinjam")
 				fmt.Scanln(&Number)
 				var BookRent model.Book = resNotRent[Number-1]
 
@@ -334,9 +332,9 @@ func main() {
 				resRentBook, err := RentCTL.AddRent(newRent)
 
 				if err != nil {
-					fmt.Println("Error on Borrow Book", err.Error())
+					fmt.Println("Eror Rent Book", err.Error())
 				} else {
-					// Update Status Is Borrowed di Buku
+
 					BookRent.Is_Rent = true
 					upRentbook, err := BookCTL.Edit(BookRent)
 					if err != nil {
@@ -352,6 +350,52 @@ func main() {
 				fmt.Println("Enter untuk menu lainnya")
 				fmt.Scanln(&next)
 			case 7:
+
+				var number int
+				res, err := RentCTL.GetUserRent(UserNow.ID)
+				if err != nil {
+					fmt.Println("Cant List Book Rent", err.Error())
+				}
+
+				fmt.Println("List Rent Book")
+				fmt.Printf("%4s | %5s | %15s | %15s | %15s |\n", "No", "ID Buku", "Judul", "Deskripsi", "Pemilik")
+
+				if res != nil {
+					i := 1
+					for _, value := range res {
+						fmt.Printf("%5d | %5d | %15s | %15s | %5d |\n", i, value.ID, value.Judul_Book, value.Deskripsi_Book, value.ID_User)
+						i++
+					}
+				} else {
+					fmt.Println("Book Not Found")
+				}
+
+				fmt.Println("Input Nomor buku untuk dikembalikan ")
+				fmt.Scanln(&number)
+				var BookReturn model.Rent = res[number-1]
+				BookReturn.Books_IsRent = true
+				upReturnBook, err := RentCTL.Model.RetRent(BookReturn)
+				if err != nil {
+					fmt.Println("Cant return book")
+				} else {
+					BookReturn, err := BookCTL.GetBookId(upReturnBook.ID_Buku)
+					if err != nil {
+						fmt.Println("Failed")
+					} else {
+						BookReturn.Is_Rent = false
+						upIsRent, err := BookCTL.Edit(BookReturn)
+						if err != nil {
+							fmt.Println("eror update")
+						} else {
+							if upIsRent.ID > 0 {
+								fmt.Println("Return book"+upReturnBook.Books_Nama, "Sucses")
+							} else {
+								fmt.Println("eror return book to not rent")
+							}
+						}
+					}
+
+				}
 
 			case 9:
 				login = false

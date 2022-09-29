@@ -31,6 +31,16 @@ func (bm BookModel) GetAll() ([]Book, error) {
 	return res, nil
 }
 
+func (bm BookModel) GetBookId(ID_Book uint) (Book, error) {
+	var res Book
+	err := bm.DB.First(&res, ID_Book).Error
+	if err != nil {
+		fmt.Println("Error ", err.Error())
+		return Book{}, err
+	}
+	return res, nil
+}
+
 func (bm BookModel) Add(newBook Book) (Book, error) {
 	err := bm.DB.Save(&newBook).Error
 	if err != nil {
