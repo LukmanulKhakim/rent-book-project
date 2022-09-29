@@ -22,10 +22,9 @@ GORM (Golang Object Relation Mapping), anda memerlukan beberapa package diantara
     go get -u github.com/go-sql-driver/mysql
     go get -u gorm.io/gorm
     go get -u gorm.io/driver/mysql
-
     ```
 
-    
+
 ### Cara Install Project Rent Book
 
 1. clone project
