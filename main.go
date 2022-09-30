@@ -256,6 +256,7 @@ func main() {
 				fmt.Println("Enter untuk menu lainnya")
 				fmt.Scanln(&next)
 			case 3:
+
 				var koleksiBaru model.Book
 
 				fmt.Print("judul :")
@@ -377,9 +378,9 @@ func main() {
 				var Number int
 				fmt.Println("Tekan Nomor Untuk buku di Pinjam")
 				fmt.Scanln(&Number)
-				var BookRent model.Book = resNotRent[Number-1]
+				var BookRent model.Book = resNotRent[Number-1] //model buku
 
-				me, err := userCTL.GetIdUser(BookRent.ID_User) //foreignKey ID User pemilik buku
+				me, err := userCTL.GetIdUser(BookRent.ID_User) //foreignKey ID User pemilik buku //user
 				if err != nil {
 					fmt.Println("Failed ")
 				}
@@ -389,6 +390,7 @@ func main() {
 				newRent.Books_IsRent = false
 				newRent.Books_Nama = me.Nama
 				newRent.Books_Email = me.Email
+
 				newRent.Judul_Book = BookRent.Judul
 				newRent.Deskripsi_Book = BookRent.Deskripsi
 				newRent.ID_Buku = BookRent.ID
