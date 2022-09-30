@@ -47,4 +47,5 @@ GORM (Golang Object Relation Mapping), anda memerlukan beberapa package diantara
     Klik lampu warna kuning dan ikuti arahan langkahnya, dan pc akan melakukan download package.
 
 
+
     

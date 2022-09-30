@@ -81,7 +81,7 @@ func main() {
 					i := 1
 					var status string
 					for _, value := range res {
-						if value.Is_Rent {
+						if value.Is_Rent == true {
 							status = "Not Available"
 						} else {
 							status = "Available"
@@ -117,7 +117,7 @@ func main() {
 					fmt.Print("addres :")
 					fmt.Scanln(&userBaru.Addres)
 
-					userBaru.IsDel = 0
+					userBaru.IsDel = 0 //acount baru
 
 					newUser, err := userCTL.Register(userBaru)
 					if err != nil {
@@ -133,7 +133,7 @@ func main() {
 					fmt.Print("pass :")
 					fmt.Scanln(&password)
 					res, err := userCTL.Login(email, password)
-					if err != nil || res.IsDel == 1 {
+					if err != nil || res.IsDel == 1 { //acount terdelete
 						fmt.Println("Login eror", err.Error())
 						login = false
 
@@ -187,7 +187,7 @@ func main() {
 			fmt.Println("===============")
 			fmt.Println("| Member Area |")
 			fmt.Println("===============")
-			fmt.Println("1. Search Book ")
+			fmt.Println("1. List Book for Rent ")
 			fmt.Println("2. List All Book   ")
 			fmt.Println("3. Add MyBook    ")
 			fmt.Println("4. Edit MyBook   ")
@@ -206,23 +206,48 @@ func main() {
 
 			switch menu {
 			case 1:
+				resNotRent, err := BookCTL.NotRent(UserNow.ID)
+				if err != nil {
+					fmt.Println("Cant show list book", err.Error())
+				}
+				fmt.Println("List Book")
+				fmt.Printf("%4s | %5s | %15s | %15s | %15s |\n", "No", "ID_Buku", "Judul", "Deskrpisi", "Status")
+
+				if resNotRent != nil {
+					i := 1
+					var status string
+					for _, value := range resNotRent {
+						if value.Is_Rent {
+							status = "Not Available"
+						} else {
+							status = "Available"
+						}
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s | \n", i, value.ID, value.Judul, value.Deskripsi, status)
+						i++
+					}
+				} else {
+					fmt.Println(" Not Found")
+				}
+				fmt.Println("Enter untuk menu lainnya")
+				fmt.Scanln(&next)
+
 			case 2:
 				res, err := BookCTL.GetAll()
 				if err != nil {
 					fmt.Println("Cant watch list book")
 				}
 				fmt.Println("List Book")
-				fmt.Printf("%4s | %5s| %15s| %15s| %15s|%15s|\n", "No", "Id ", "Judul", "Deskripsi", "Status", "Pemilik")
+				fmt.Printf("%4s | %5s| %15s| %15s| %15s|\n", "No", "Id ", "Judul", "Deskripsi", "Status") //perapian kolom
 				if res != nil {
 					i := 1
 					var status string
 					for _, value := range res {
-						if value.Is_Rent {
+						if value.Is_Rent == true {
 							status = "Not Available"
 						} else {
 							status = "Available"
 						}
-						fmt.Printf("%4d | %5d | %15s | %15s | %15s | %5d| \n", i, value.ID, value.Judul, value.Deskripsi, status, value.ID_User)
+						fmt.Printf("%4d | %5d | %15s | %15s | %15s |  \n", i, value.ID, value.Judul, value.Deskripsi, status)
 						i++
 					}
 				} else {
@@ -231,20 +256,20 @@ func main() {
 				fmt.Println("Enter untuk menu lainnya")
 				fmt.Scanln(&next)
 			case 3:
-				var produkBaru model.Book
+				var koleksiBaru model.Book
 
 				fmt.Print("judul :")
-				fmt.Scanln(&produkBaru.Judul)
+				fmt.Scanln(&koleksiBaru.Judul)
 				fmt.Print("deskripsi :")
-				fmt.Scanln(&produkBaru.Deskripsi)
-				produkBaru.Is_Rent = false
-				produkBaru.Is_Deleted = false
-				produkBaru.ID_User = UserNow.ID
-				BukuBaru, err := BookCTL.Add(produkBaru)
+				fmt.Scanln(&koleksiBaru.Deskripsi)
+				koleksiBaru.Is_Rent = false
+				koleksiBaru.Is_Deleted = false
+				koleksiBaru.ID_User = UserNow.ID
+				BukuBaru, err := BookCTL.Add(koleksiBaru)
 				if err != nil {
 					fmt.Println("Eror insert", err.Error())
 				}
-				fmt.Println("Selesai input produk", BukuBaru)
+				fmt.Println("Selesai input produk", BukuBaru.Judul)
 			case 4:
 				//edit buku
 				var number int
@@ -260,7 +285,7 @@ func main() {
 					i := 1
 					var status string
 					for _, value := range res {
-						if value.Is_Rent {
+						if value.Is_Rent == true {
 							status = "Not Available"
 						} else {
 							status = "Available"
@@ -301,7 +326,7 @@ func main() {
 					i := 1
 					var status string
 					for _, value := range res {
-						if value.Is_Rent {
+						if value.Is_Rent == true {
 							status = "Not Available"
 						} else {
 							status = "Available"
@@ -350,14 +375,15 @@ func main() {
 					fmt.Println(" Not Found")
 				}
 				var Number int
-				fmt.Println("Tekan Nomor Buku Untuk di Pinjam")
+				fmt.Println("Tekan Nomor Untuk buku di Pinjam")
 				fmt.Scanln(&Number)
 				var BookRent model.Book = resNotRent[Number-1]
 
-				me, err := userCTL.GetIdUser(BookRent.ID_User)
+				me, err := userCTL.GetIdUser(BookRent.ID_User) //foreignKey ID User pemilik buku
 				if err != nil {
 					fmt.Println("Failed ")
 				}
+				//proses saving database rent
 				var newRent model.Rent
 				newRent.Return_book = time.Time{}
 				newRent.Books_IsRent = false
@@ -373,14 +399,14 @@ func main() {
 				if err != nil {
 					fmt.Println("Eror Rent Book", err.Error())
 				} else {
-
+					//edit status buku Is.Rent
 					BookRent.Is_Rent = true
 					upRentbook, err := BookCTL.Edit(BookRent)
 					if err != nil {
 						fmt.Println("Eror Update Rent Book", err.Error())
 					} else {
 						if upRentbook.ID != 0 {
-							fmt.Println("Success rent book : "+resRentBook.Judul_Book, "")
+							fmt.Println("Success rent book : " + resRentBook.Judul_Book)
 						} else {
 							fmt.Println("No Rent Book", err.Error())
 						}
@@ -395,12 +421,12 @@ func main() {
 				}
 
 				fmt.Println("List Rent Book")
-				fmt.Printf("%4s | %5s | %15s | %15s | %15s |\n", "No", "ID Buku", "Judul", "Deskripsi", "Pemilik")
+				fmt.Printf("%5s | %5s | %15s | %15s | %15s |\n", "No", "ID Buku", "Judul", "Deskripsi", "Pemilik")
 
 				if res != nil {
 					i := 1
 					for _, value := range res {
-						fmt.Printf("%5d | %5d | %15s | %15s | %5d |\n", i, value.ID, value.Judul_Book, value.Deskripsi_Book, value.ID_User)
+						fmt.Printf("%5d | %5d | %15s | %15s | %15s |\n", i, value.ID, value.Judul_Book, value.Deskripsi_Book, value.Books_Nama)
 						i++
 					}
 				} else {
@@ -408,6 +434,7 @@ func main() {
 				}
 				fmt.Println("Enter untuk menu lainnya")
 				fmt.Scanln(&next)
+
 			case 8:
 
 				var number int
@@ -422,7 +449,7 @@ func main() {
 				if res != nil {
 					i := 1
 					for _, value := range res {
-						fmt.Printf("%5d | %5d | %15s | %15s | %5d |\n", i, value.ID, value.Judul_Book, value.Deskripsi_Book, value.ID_User)
+						fmt.Printf("%5d | %5d | %15s | %15s | %5s |\n", i, value.ID, value.Judul_Book, value.Deskripsi_Book, value.Books_Nama)
 						i++
 					}
 				} else {

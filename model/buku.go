@@ -60,7 +60,7 @@ func (bm BookModel) Edit(bukuEdit Book) (Book, error) {
 }
 
 func (bm BookModel) Delete(deletedBook Book) (Book, error) {
-	err := bm.DB.Delete(&deletedBook).Error
+	err := bm.DB.Delete(&deletedBook).Error //hard delete dengan unscoped()
 	if err != nil {
 		fmt.Println("Error on Delete Model", err.Error())
 		return Book{}, err

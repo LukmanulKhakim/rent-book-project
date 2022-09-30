@@ -26,7 +26,7 @@ type UserModel struct {
 
 // register
 func (um UserModel) Register(NewUser User) (User, error) {
-	Pass, err := bcrypt.GenerateFromPassword([]byte(NewUser.Password), bcrypt.DefaultCost)
+	Pass, err := bcrypt.GenerateFromPassword([]byte(NewUser.Password), bcrypt.DefaultCost) //dycrypt password
 	if err != nil {
 		return NewUser, err
 	}
@@ -46,7 +46,7 @@ func (um UserModel) Login(Email, Password string) (User, error) {
 		fmt.Println("email wrong")
 		return user, err
 	}
-	//fmt.Println(user, Email, Password)
+	//pencocokan password
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(Password))
 	if err != nil {
 		fmt.Println("password wrong")
